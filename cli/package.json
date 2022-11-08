@@ -1,0 +1,26 @@
+{
+    "name": "parkink-cli",
+    "version": "1.0.0",
+    "description": "NodeJS Script to handle the CLI of parkink's software platform",
+    "main": "src/index.js",
+    "author": "Pablo Ortiz López",
+    "license": "ISC",
+    "type": "module",
+    "dependencies": {
+        "merge-yaml": "1.1.0",
+        "crypto": "1.0.1",
+        "nanospinner": "1.1.0",
+        "inquirer": "9.1.2"
+    },
+    "devDependencies": {
+        "@babel/core": "7.18.9",
+        "@babel/node": "7.18.9",
+        "@babel/preset-env": "7.18.9",
+        "eslint": "8.2.0",
+        "eslint-config-airbnb": "19.0.4",
+        "eslint-plugin-import": "2.25.3",
+        "eslint-plugin-jsx-a11y": "6.5.1",
+        "eslint-plugin-react": "7.28.0",
+        "eslint-plugin-react-hooks": "4.3.0"
+    }
+}

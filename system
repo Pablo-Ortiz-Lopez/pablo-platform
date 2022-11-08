@@ -1,0 +1,61 @@
+if [[ $OSTYPE == 'darwin'* ]]; then
+  export DOCKER_GID=$(id -g)
+else
+  export DOCKER_GID=$(cut -d: -f3 < <(getent group docker))
+fi
+
+if [ "$1" = "build" ]; then
+	docker build -t pabloortiz132/platform cli # >/dev/null
+	exit
+fi
+
+if [ "$1" = "push" ];then
+	docker push pabloortiz132/platform
+	exit
+fi
+
+# Run NodeJS CLI
+docker stop platform-standalone &>/dev/null
+
+if [ "$CI_MODE" = "1" ]; then
+	ttyArgs=''
+else
+	ttyArgs='-ti'
+fi
+
+if [ "$1" = "test-panel" ];then
+	shift
+	docker run --rm $ttyArgs \
+		--user $(id -u):$DOCKER_GID \
+		-v $PWD/../HomePanel:/project \
+		-v $PWD:/platform \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ~/.gitconfig:/etc/gitconfig \
+		-e PROJECT_DIR=$PWD/../HomePanel \
+		-e CI_MODE=$CI_MODE \
+		--network host \
+		--name  homepanel-platform-debug \
+		pabloortiz132/platform \
+		$@
+	exit
+fi
+
+if [ "$1" = "test-parkink" ];then
+	shift
+	export PLATFORM_NETWORK=$(docker network ls | grep -oh 'parkink_web[^ ]*')	
+	docker run --rm $ttyArgs \
+		--user $(id -u):$DOCKER_GID \
+		-v $PWD/../parkink-platform:/project \
+		-v $PWD:/platform \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ~/.gitconfig:/etc/gitconfig \
+		-e PROJECT_DIR=$PWD/../parkink-platform \
+		-e PLATFORM_NETWORK=$PLATFORM_NETWORK \
+		-e CI_MODE=$CI_MODE \
+		-e BIND_IP=127.0.0.1: \
+		--network host \
+		--name parkink-platform-debug \
+		pabloortiz132/platform \
+		$@
+	exit
+fi
