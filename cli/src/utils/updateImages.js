@@ -12,7 +12,6 @@ const hashFile = (path) => {
 }
 
 export default async (requiredImages, buildIfMissing = true) => {
-    console.log({ requiredImages })
     const built = []
     let dockerfileHashes = {}
 
