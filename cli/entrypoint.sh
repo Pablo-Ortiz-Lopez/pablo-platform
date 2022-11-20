@@ -2,7 +2,7 @@
 
 cd /platform/cli
 
-yarn &>/dev/null
+# yarn &>/dev/null # Moved to Dockerfile
 
 export NODE_NO_WARNINGS=1
 

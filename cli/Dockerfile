@@ -30,6 +30,8 @@ USER node
 
 RUN npm config set update-notifier false
 
-COPY . /platform/cli
+COPY --chown=node . /platform/cli
+
+RUN cd /platform/cli && yarn
 
 ENTRYPOINT ["/platform/cli/entrypoint.sh"] 
