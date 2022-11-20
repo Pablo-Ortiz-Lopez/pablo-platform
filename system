@@ -5,14 +5,19 @@ else
 fi
 
 if [ "$1" = "build" ]; then
-	docker build -t pabloortiz132/platform cli # >/dev/null
+	# docker build -t pabloortiz132/platform cli # >/dev/null
+	DOCKER_BUILDKIT=1 docker buildx build \
+		--push \
+		--platform linux/arm/v7,linux/amd64 \
+		--tag pabloortiz132/platform:latest \
+		cli
 	exit
 fi
 
-if [ "$1" = "push" ];then
-	docker push pabloortiz132/platform
-	exit
-fi
+# if [ "$1" = "push" ];then
+# 	docker push pabloortiz132/platform
+# 	exit
+# fi
 
 # Run NodeJS CLI
 docker stop platform-standalone &>/dev/null
