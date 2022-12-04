@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import mergeYaml from 'merge-yaml'
-import bash from './bash'
-import updateImages from './updateImages'
+import bash from '../utils/bash'
+import updateImages from '../utils/updateImages'
 
 const getComposeArgs = (stack, dev = false) => {
     const projectName = process.env.PROJECT_DIR.split('/').slice(-1)[0]

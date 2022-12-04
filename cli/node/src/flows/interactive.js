@@ -1,6 +1,6 @@
 import * as child_process from 'child_process'
 import inquirer from 'inquirer'
-import commands from './commands'
+import nonInteractive from './nonInteractive'
 import colorLog from '../utils/colorLog'
 import fs from 'fs'
 
@@ -69,7 +69,7 @@ export default async () => {
         ]
     }])
 
-    await commands([
+    await nonInteractive([
         operation,
         stack,
         ...(log ? ['-l'] : []),

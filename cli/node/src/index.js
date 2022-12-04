@@ -1,4 +1,4 @@
-import commands from './flows/commands'
+import nonInteractive from './flows/nonInteractive'
 import interactive from './flows/interactive'
 import colorLog from './utils/colorLog'
 //import updateImages from './utils/updateImages'
@@ -7,7 +7,7 @@ const main = async () => {
     if (process.argv.length < 3) {
         await interactive()
     } else {
-        await commands([...process.argv].splice(2))
+        await nonInteractive([...process.argv].splice(2))
     }
 }
 

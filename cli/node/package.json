@@ -1,7 +1,7 @@
 {
     "name": "parkink-cli",
     "version": "1.0.0",
-    "description": "NodeJS Script to handle the CLI of parkink's software platform",
+    "description": "NodeJS Script to handle the CLI of Pablo's software platform",
     "main": "src/index.js",
     "author": "Pablo Ortiz López",
     "license": "ISC",
