@@ -1,21 +1,15 @@
 import { spawn } from 'child_process';
-import colorLog from './colorLog';
-import { createSpinner } from 'nanospinner'
+import { createSpinner } from './colorLog';
 
-const logStatus = (spinner, msg, result = 'ok') => {
-    if (spinner) {
-        if (result == 'ok') {
-            spinner.success()
-        } else {
-            spinner.error()
-        }
-    } else {
-        colorLog(msg, result)
-    }
-}
 
 export default (command, {
-    alias, log = false, silent = false, container, critical = true, liveOnly = false
+    alias,
+    log = false,
+    silent = false,
+    container,
+    critical = true,
+    liveOnly = false,
+    returnStd = false // By default, it returns a boolean of whether it succeeded. With this option it will return the std object
 } = {}) => new Promise((resolve, reject) => {
     const commands = typeof command === 'string' ? command : command.join(' && ');
     const commandName = alias || commands.split(' ')[0];
@@ -37,14 +31,14 @@ export default (command, {
 
     let spinner
     if (log) {
-        if (!process.env.CI_MODE == '1') {
-            spinner = createSpinner(commandName).start()
-        } else {
-            colorLog(commandName, 'run')
-        }
+        spinner = createSpinner(commandName)
     }
 
-    const savedLines = []
+    const std = {
+        stdout: [],
+        stderr: [],
+    }
+    const mergedStd = []
 
     //! silent && run.stdout.pipe(process.stdout);
     //! silent && run.stderr.pipe(process.stderr);
@@ -53,30 +47,34 @@ export default (command, {
             const lines = data.toString().split('\n');
             for (const line of lines) {
                 if (!silent && !liveOnly) process.stderr.write(`\x1b[34m${line}\n\x1b[0m`);
-                savedLines.push(line)
+                std.stdout.push(line)
+                mergedStd.push({ pipe: 'stdout', line })
             }
         });
         run.stderr.on('data', (data) => {
             const lines = data.toString().split('\n');
             for (const line of lines) {
                 if (!silent && !liveOnly) process.stderr.write(`\x1b[31m${line}\n\x1b[0m`);
-                savedLines.push(line)
+                std.stderr.push(line)
+                mergedStd.push({ pipe: 'stderr', line })
             }
         });
     }
 
     run.on('close', (code) => {
         if (!code) {
-            if (log) logStatus(spinner, commandName, 'ok')
-            resolve(true);
+            if (spinner) spinner.end('ok')
+            resolve(returnStd ? std : true);
         } else if (critical) {
-            if (log && spinner) logStatus(spinner, commandName, 'error')
-            for (const line of savedLines) process.stderr.write(`\x1b[31m${line}\n\x1b[0m`);
-            reject(commandName);
+            if (spinner) spinner.end('error')
+            for (const { pipe, line } of mergedStd) {
+                const colorCode = pipe == 'stderr' ? '31' : '0'
+                process[pipe].write(`\x1b[${colorCode}m${line}\n\x1b[0m`);
+            }
+            reject(returnStd ? std : commandName);
         } else {
-            if (log) logStatus(spinner, commandName, 'error')
-            for (const line of savedLines) process.stderr.write(`\x1b[31m${line}\n\x1b[0m`);
-            resolve(false);
+            if (spinner) spinner.end('error')
+            resolve(returnStd ? std : false);
         }
     });
 });

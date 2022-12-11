@@ -1,4 +1,29 @@
-export default (msg, type = 'info') => {
+import { createSpinner as createSpinnerLib } from "nanospinner"
+
+export const createSpinner = (message) => {
+    let spinner
+    if (process.env.CI_MODE != '1') { // ! CI_MODE
+        spinner = createSpinnerLib(message).start()
+    } else {
+        colorLog(message, 'run')
+    }
+
+    return {
+        end: (result = 'ok') => {
+            if (spinner) { // ! CI_MODE
+                if (result == 'ok') {
+                    spinner.success()
+                } else {
+                    spinner.error()
+                }
+            } else {
+                colorLog(message, result)
+            }
+        }
+    }
+}
+
+export const colorLog = (msg, type = 'info') => {
     switch (type) {
         case 'error':
             console.log(`\x1b[31m✖ ${msg}\x1b[0m`);
@@ -17,3 +42,5 @@ export default (msg, type = 'info') => {
             break;
     }
 }
+
+export default colorLog
